@@ -20,26 +20,57 @@ unsigned char pad = 0x00;
 unsigned char lock_state = 0x01;
 unsigned char lock_signal = 0x01; // 1 -> locked; 0 -> unlocked
 
+void set_PWM(double frequency) {
+    static double current_frequency;
+
+    if (frequency != current_frequency) {
+        if (!frequency) {TCCR3B &= 0x08;}
+        else {TCCR3B |= 0x03;}
+
+        if (frequency < 0.954) {OCR3A = 0xFFFF; }
+
+        else if (frequency > 31250) { OCR3A = 0x0000; }
+
+        else {OCR3A = (short)(8000000 / (128 * frequency)) - 1;}
+
+        TCNT3 = 0;
+        current_frequency = frequency;
+    }
+}
+
+void PWM_on() {
+    TCCR3A = (1 << COM3A0);
+
+    TCCR3B = (1 << WGM32) | (1 << CS31) | (1 << CS30);
+
+    set_PWM(0);
+}
+
+void PWM_off() {
+    TCCR3A = 0x00;
+    TCCR3B = 0x00;
+}
+
 int keypad_tick(int state) {
     pad = GetKeypadKey();
     switch(pad) {
         case '\0': PORTB = 0x00 | (PINB & 0x81); break;
-        case '1': PORTB = 0x40 | (PINB & 0x81); break;
-        case '2': PORTB = 0x40 | (PINB & 0x81); break;
-        case '3': PORTB = 0x40 | (PINB & 0x81); break;
-        case '4': PORTB = 0x40 | (PINB & 0x81); break;
-        case '5': PORTB = 0x40 | (PINB & 0x81); break;
-        case '6': PORTB = 0x40 | (PINB & 0x81); break;
-        case '7': PORTB = 0x40 | (PINB & 0x81); break;
-        case '8': PORTB = 0x40 | (PINB & 0x81); break;
-        case '9': PORTB = 0x40 | (PINB & 0x81); break;
-        case 'A': PORTB = 0x40 | (PINB & 0x81); break;
-        case 'B': PORTB = 0x40 | (PINB & 0x81); break;
-        case 'C': PORTB = 0x40 | (PINB & 0x81); break;
-        case 'D': PORTB = 0x40 | (PINB & 0x81); break;
-        case '*': PORTB = 0x40 | (PINB & 0x81); break;
-        case '0': PORTB = 0x40 | (PINB & 0x81); break;
-        case '#': PORTB = 0x40 | (PINB & 0x81); break;
+        case '1': PORTB = 0x20 | (PINB & 0x81); break;
+        case '2': PORTB = 0x20 | (PINB & 0x81); break;
+        case '3': PORTB = 0x20 | (PINB & 0x81); break;
+        case '4': PORTB = 0x20 | (PINB & 0x81); break;
+        case '5': PORTB = 0x20 | (PINB & 0x81); break;
+        case '6': PORTB = 0x20 | (PINB & 0x81); break;
+        case '7': PORTB = 0x20 | (PINB & 0x81); break;
+        case '8': PORTB = 0x20 | (PINB & 0x81); break;
+        case '9': PORTB = 0x20 | (PINB & 0x81); break;
+        case 'A': PORTB = 0x20 | (PINB & 0x81); break;
+        case 'B': PORTB = 0x20 | (PINB & 0x81); break;
+        case 'C': PORTB = 0x20 | (PINB & 0x81); break;
+        case 'D': PORTB = 0x20 | (PINB & 0x81); break;
+        case '*': PORTB = 0x20 | (PINB & 0x81); break;
+        case '0': PORTB = 0x20 | (PINB & 0x81); break;
+        case '#': PORTB = 0x20 | (PINB & 0x81); break;
         default: PORTB = 0x00; break;
     }
     return state;
@@ -92,7 +123,6 @@ int check_pass(int state) {
 enum lock_states {lock_wait, lock_pressed};
 int check_lock(int state) {
     unsigned char input = (~PINB & 0x80);
-    state = lock_wait;
     switch(state) {
         case lock_wait:
             if(input != 0x00){
@@ -115,13 +145,45 @@ int display_lock(int state) {
     } else PORTB &= 0xFE;
 }
 
+unsigned char bell_timer = 0x0C;
+unsigned double song[5] = {440, 349.23, 392.00, 261.63, 261.63};
+unsigned char bell_index = 0x00;
+unsigned char bell_time = 0x0F;
+
+enum bell_states {bell_wait, bell_play};
+
+int doorbell_tick(int state) {
+    unsigned char input = (~PINB & 0x40);
+    switch(state) {
+        case bell_wait: 
+            if (input != 0x00) {
+                state = bell_play;
+            } else state = bell_wait;
+            break;
+        case bell_play:
+            if (bell_time <= bell_timer) {
+                bell_time += 1;
+                state = bell_play;
+            } else if (bell_index <= 5) {
+                bell_time = 0;
+                set_PWM(song[bell_index]);
+                state = bell_play;
+            } else {
+                bell_time = 0;
+                set_PWM(0);
+                state = bell_wait;
+            }
+        default: state = bell_wait;
+    }
+}
+
 int main(void) {
     /* Insert DDR and PORT initializations */
     DDRB = 0x7F; PORTB = 0x80;
     DDRC = 0xF0; PORTC = 0x0F;
     /* Insert your solution below */
-    static task task1, task2, task3, task4;
-    task *tasks[] = {&task1, &task2, &task3, &task4};
+    static task task1, task2, task3, task4, task5;
+    task *tasks[] = {&task1, &task2, &task3, &task4, &task5};
     const unsigned short numTasks = sizeof(tasks)/sizeof(task*);
     const char start = -1;
 
@@ -145,6 +207,11 @@ int main(void) {
     task4.elapsedTime = task4.period;
     task4.TickFct = &display_lock;
 
+    task5.state = start;
+    task5.period = 50;
+    task5.elapsedTime = task5.period;
+    task5.TickFct = &doorbell_tick;
+
     unsigned long GCD = tasks[0]->period;
     for(unsigned long i = 1; i < numTasks; i++){
         GCD = findGCD(GCD, tasks[i]->period);
@@ -152,6 +219,7 @@ int main(void) {
 
     TimerSet(GCD);
     TimerOn();
+    PWM_on();
 
     while (1) {
         for(unsigned long i = 0; i < numTasks; i++) {
