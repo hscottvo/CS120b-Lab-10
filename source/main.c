@@ -61,7 +61,7 @@ int check_lock(int state) {
         case pass_wait:
             if(input != 0x00){
                 lock_signal = 0x01;
-                state = pass_
+                state = pass_wait;
             } else PORTB &= 0xFE;
     }
     switch(state) {
