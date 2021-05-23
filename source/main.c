@@ -48,9 +48,45 @@ int keypad_tick(int state) {
 unsigned char pass[5] = {'1', '2', '3', '4', '5'};
 unsigned char pass_index = 0x00;
 
-enum pass_states {pass_wait};
+enum pass_states {pass_wait, pass_start, pass_input, pass_input_press, pass_unlock};
 
 int check_pass(int state) {
+    switch(state) {
+        case pass_wait:
+            if(pad == '#') {
+                state = pass_start;
+            } else state = pass_wait;
+            pass_index = 0x00;
+            break;
+        case pass_start: 
+            if (pad == '#') state = pass_start;
+            else if (pad == '\0') state = pass_input;
+            else state = pass_wait;
+            break;
+        case pass_input: 
+            if(pad == '\0') state = pass_input;
+            else if (pad == pass[pass_index]) {
+                if(pass_index == 4) {
+                    state = pass_unlock;
+                } else {
+                    pass_index += 1;
+                    state = pass_input_press;
+                }
+            }
+            else {
+                state = pass_wait;
+            }
+            break;
+        case pass_input_press: 
+            if (pad == '\0') state = pass_input;
+            else state = pass_input_press;
+            break;
+        case pass_unlock:
+            lock_state = 0x01;
+            if (pad == '\0') state = pass_wait;
+            else state = pass_unlock;
+        default: state = pass_wait;
+    }
     return state;
 }
 enum lock_states {lock_wait, lock_pressed};
@@ -68,9 +104,7 @@ int check_lock(int state) {
             if(input != 0x00) {
                 state = lock_pressed;
             } else state = lock_wait;
-    }
-    switch(state) {
-
+        default: state = lock_wait;
     }
     return state;
 }
