@@ -49,8 +49,8 @@ unsigned char pass_index;
 enum pass_states {pass_wait};
 
 int check_pass(int state) {
-    if(GetBit(PORTB, 7) >> 7 == 0x01) PORTB = 0x01 | (PORTB & 0x8E);
-    else PORTB = 0x00 | (PORTB & 0x8E);
+    if ((PORTB & 0x80) >> 7 == 0x01) PORTB = 0x01 & (PORTB & 0xFE);
+    else PORTB = 0x00 & (PORTB & 0xFE);
     switch(state) {
         case pass_wait:
             if (pad == 0x01) PORTB = 0x00;
