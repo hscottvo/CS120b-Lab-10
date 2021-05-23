@@ -16,32 +16,33 @@
 #include "scheduler.h"
 #endif
 
-enum keypad_states {light_on, light_off};
 
 int keypad_tick(int state) {
     unsigned char pad = GetKeypadKey();
     switch(pad) {
         case '\0': PORTB = 0x1F; break;
-        case '1': PORTB = 0x01; break;
-        case '2': PORTB = 0x01; break;
-        case '3': PORTB = 0x03; break;
-        case '4': PORTB = 0x04; break;
-        case '5': PORTB = 0x05; break;
-        case '6': PORTB = 0x06; break;
-        case '7': PORTB = 0x07; break;
-        case '8': PORTB = 0x08; break;
-        case '9': PORTB = 0x09; break;
-        case 'A': PORTB = 0x0A; break;
-        case 'B': PORTB = 0x0B; break;
-        case 'C': PORTB = 0x0C; break;
-        case 'D': PORTB = 0x0D; break;
-        case '*': PORTB = 0x0E; break;
-        case '0': PORTB = 0x00; break;
-        case '#': PORTB = 0x0F; break;
-        default: PORTB = 0x1B; break;
+        unsigned char on = 0x80;
+        case '1': PORTB = 0x01 | on; break;
+        case '2': PORTB = 0x01 | on; break;
+        case '3': PORTB = 0x03 | on; break;
+        case '4': PORTB = 0x04 | on; break;
+        case '5': PORTB = 0x05 | on; break;
+        case '6': PORTB = 0x06 | on; break;
+        case '7': PORTB = 0x07 | on; break;
+        case '8': PORTB = 0x08 | on; break;
+        case '9': PORTB = 0x09 | on; break;
+        case 'A': PORTB = 0x0A | on; break;
+        case 'B': PORTB = 0x0B | on; break;
+        case 'C': PORTB = 0x0C | on; break;
+        case 'D': PORTB = 0x0D | on; break;
+        case '*': PORTB = 0x0E | on; break;
+        case '0': PORTB = 0x00 | on; break;
+        case '#': PORTB = 0x0F | on; break;
+        default: PORTB = 0x1B | on; break;
     }
     return state;
 }
+
 
 int main(void) {
     /* Insert DDR and PORT initializations */
