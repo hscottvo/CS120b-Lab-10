@@ -22,7 +22,7 @@ unsigned char lock_state = 0x01;
 int keypad_tick(int state) {
     pad = GetKeypadKey();
     switch(pad) {
-        case '\0': PORTB = 0x00; break;
+        case '\0': break;
         case '1': PORTB = 0x40 | (~PORTB & 0x80); break;
         case '2': PORTB = 0x40 | (~PORTB & 0x80); break;
         case '3': PORTB = 0x40 | (~PORTB & 0x80); break;
@@ -50,10 +50,10 @@ unsigned char pass_index;
 enum pass_states {pass_wait};
 
 int check_pass(int state) {
-    unsigned char input = (~PORTB >> 7) & 0x01;
+    unsigned char input = (~PORTB & 0x80);
     switch(state) {
         case pass_wait:
-            PORTB = input;
+            PORTB = input >> 3;
     }
     switch(state) {
 
