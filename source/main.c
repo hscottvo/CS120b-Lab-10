@@ -53,7 +53,7 @@ int check_pass(int state) {
     unsigned char input = (~PORTB & 0x80);
     switch(state) {
         case pass_wait:
-            PORTB = input >> 3;
+            PORTB = 0x01 | (~PORTB & 0xFE);
     }
     switch(state) {
 
