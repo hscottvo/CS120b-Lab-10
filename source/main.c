@@ -54,7 +54,7 @@ int check_pass(int state) {
     state = pass_wait;
     switch(state) {
         case pass_wait:
-            PORTB |= (input >> 7);
+            PORTB = input == 0x80? (PINB | 0x01): (PINB && 0xFE);
     }
     switch(state) {
 
