@@ -172,6 +172,7 @@ int doorbell_tick(int state) {
                 state = bell_play;
             } else {
                 bell_time = 0;
+                bell_index = 0;
                 set_PWM(0);
                 state = bell_wait;
             }
