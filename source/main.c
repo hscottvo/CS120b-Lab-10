@@ -60,12 +60,11 @@ int check_pass(int state) {
 
 int main(void) {
     /* Insert DDR and PORT initializations */
-    unsigned char x;
     DDRB = 0x7F; PORTB = 0x80;
     DDRC = 0xF0; PORTC = 0x0F;
     /* Insert your solution below */
-    static task task1;
-    task *tasks[] = {&task1};
+    static task task1, task2;
+    task *tasks[] = {&task1, &task2};
     const unsigned short numTasks = sizeof(tasks)/sizeof(task*);
     const char start = -1;
 
