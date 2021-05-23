@@ -146,7 +146,7 @@ int display_lock(int state) {
 }
 
 unsigned char bell_timer = 0x0C;
-unsigned double song[5] = {440, 349.23, 392.00, 261.63, 261.63};
+double song[5] = {440, 349.23, 392.00, 261.63, 261.63};
 unsigned char bell_index = 0x00;
 unsigned char bell_time = 0x0F;
 
