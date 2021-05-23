@@ -18,7 +18,7 @@
 
 unsigned char pad = 0x00;
 unsigned char lock_state = 0x01;
-unsigned char lock_signal = 0x00;
+unsigned char lock_signal = 0x01;
 
 int keypad_tick(int state) {
     pad = GetKeypadKey();
@@ -60,7 +60,7 @@ int check_lock(int state) {
     switch(state) {
         case lock_wait:
             if(input != 0x00){
-                lock_signal = 0x01;
+                lock_signal = 0x00;
                 state = lock_pressed;
             } else state = lock_wait;
             break;
