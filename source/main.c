@@ -53,17 +53,21 @@ enum pass_states {pass_wait};
 int check_pass(int state) {
     return state;
 }
-
+enum lock_states {lock_wait, lock_pressed};
 int check_lock(int state) {
     unsigned char input = (~PINB & 0x80);
-    state = pass_wait;
+    state = lock_wait;
     switch(state) {
-        case pass_wait:
+        case lock_wait:
             if(input != 0x00){
                 lock_signal = 0x01;
-                state = pass_wait;
-                PORTB |= 0x01;
-            } else PORTB &= 0xFE;
+                state = lock_pressed;
+            } else state = lock_wait;
+            break;
+        case lock_pressed: 
+            if(input != 0x00) {
+                state = lock_pressed;
+            } else state = lock_wait;
     }
     switch(state) {
 
@@ -71,13 +75,19 @@ int check_lock(int state) {
     return state;
 }
 
+int display_lock(int state) {
+    if(lock_signal == 0x00) {
+        PORTB |= 0x01;
+    } else PORTB &= 0xFE;
+}
+
 int main(void) {
     /* Insert DDR and PORT initializations */
     DDRB = 0x7F; PORTB = 0x80;
     DDRC = 0xF0; PORTC = 0x0F;
     /* Insert your solution below */
-    static task task1, task2, task3;
-    task *tasks[] = {&task1, &task2, &task3};
+    static task task1, task2, task3, task4;
+    task *tasks[] = {&task1, &task2, &task3, &task4};
     const unsigned short numTasks = sizeof(tasks)/sizeof(task*);
     const char start = -1;
 
@@ -95,6 +105,11 @@ int main(void) {
     task3.period = 50;
     task3.elapsedTime = task3.period;
     task3.TickFct = &check_lock;
+
+    task4.state = start;
+    task4.period = 50;
+    task4.elapsedTime = task4.period;
+    task4.TickFct = &display_lock;
 
     unsigned long GCD = tasks[0]->period;
     for(unsigned long i = 1; i < numTasks; i++){
