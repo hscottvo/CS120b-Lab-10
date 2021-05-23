@@ -175,6 +175,7 @@ int doorbell_tick(int state) {
                 set_PWM(0);
                 state = bell_wait;
             }
+            break;
         default: state = bell_wait;
     }
     return state;
