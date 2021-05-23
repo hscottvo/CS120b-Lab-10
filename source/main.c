@@ -16,9 +16,10 @@
 #include "scheduler.h"
 #endif
 
+unsigned char pad = 0x00;
 
 int keypad_tick(int state) {
-    unsigned char pad = GetKeypadKey();
+    pad = GetKeypadKey();
     switch(pad) {
         case '\0': PORTB = 0x00; break;
         case '1': PORTB = 0x80; break;
@@ -42,6 +43,7 @@ int keypad_tick(int state) {
     return state;
 }
 
+unsigned char pass[5] = {'1', '2', '3', '4', '5'};
 
 int main(void) {
     /* Insert DDR and PORT initializations */
