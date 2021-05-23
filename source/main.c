@@ -12,6 +12,7 @@
 #include "simAVRHeader.h"
 #include "bit.h"
 #include "keypad.h"
+#include "scheduler.h"
 #endif
 
 int main(void) {
