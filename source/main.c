@@ -175,6 +175,7 @@ int doorbell_tick(int state) {
             }
         default: state = bell_wait;
     }
+    return state;
 }
 
 int main(void) {
