@@ -22,33 +22,46 @@ int keypad_tick(int state) {
     pad = GetKeypadKey();
     switch(pad) {
         case '\0': PORTB = 0x00; break;
-        case '1': PORTB = 0x80; break;
-        case '2': PORTB = 0x80; break;
-        case '3': PORTB = 0x80; break;
-        case '4': PORTB = 0x80; break;
-        case '5': PORTB = 0x80; break;
-        case '6': PORTB = 0x80; break;
-        case '7': PORTB = 0x80; break;
-        case '8': PORTB = 0x80; break;
-        case '9': PORTB = 0x80; break;
-        case 'A': PORTB = 0x80; break;
-        case 'B': PORTB = 0x80; break;
-        case 'C': PORTB = 0x80; break;
-        case 'D': PORTB = 0x80; break;
-        case '*': PORTB = 0x80; break;
-        case '0': PORTB = 0x80; break;
-        case '#': PORTB = 0x80; break;
+        case '1': PORTB = 0x40 | (PORTB & 0x80); break;
+        case '2': PORTB = 0x40 | (PORTB & 0x80); break;
+        case '3': PORTB = 0x40 | (PORTB & 0x80); break;
+        case '4': PORTB = 0x40 | (PORTB & 0x80); break;
+        case '5': PORTB = 0x40 | (PORTB & 0x80); break;
+        case '6': PORTB = 0x40 | (PORTB & 0x80); break;
+        case '7': PORTB = 0x40 | (PORTB & 0x80); break;
+        case '8': PORTB = 0x40 | (PORTB & 0x80); break;
+        case '9': PORTB = 0x40 | (PORTB & 0x80); break;
+        case 'A': PORTB = 0x40 | (PORTB & 0x80); break;
+        case 'B': PORTB = 0x40 | (PORTB & 0x80); break;
+        case 'C': PORTB = 0x40 | (PORTB & 0x80); break;
+        case 'D': PORTB = 0x40 | (PORTB & 0x80); break;
+        case '*': PORTB = 0x40 | (PORTB & 0x80); break;
+        case '0': PORTB = 0x40 | (PORTB & 0x80); break;
+        case '#': PORTB = 0x40 | (PORTB & 0x80); break;
         default: PORTB = 0x00; break;
     }
     return state;
 }
 
 unsigned char pass[5] = {'1', '2', '3', '4', '5'};
+unsigned char pass_index;
+
+int check_pass(int state) {
+    if(GetBit(PORTB, 7) >> 7 == 0x01) PORTB = 0x01 | (PORTB & 0x8E);
+    else PORTB = 0x00 | (PORTB & 0x8E);
+    switch(pass_states) {
+        case pass_wait:
+            if (pad == 0x01) PORTB = 0x00;
+    }
+    switch(pass_states) {
+
+    }
+}
 
 int main(void) {
     /* Insert DDR and PORT initializations */
     unsigned char x;
-    DDRB = 0xFF; PORTB = 0x00;
+    DDRB = 0x7F; PORTB = 0x80;
     DDRC = 0xF0; PORTC = 0x0F;
     /* Insert your solution below */
     static task task1;
@@ -60,6 +73,11 @@ int main(void) {
     task1.period = 50;
     task1.elapsedTime = task1.period;
     task1.TickFct = &keypad_tick;
+
+    task2.state = start;
+    task2.period = 50;
+    task2.elapsedTime = task2.period;
+    task2.TickFct = &check_pass;
 
     unsigned long GCD = tasks[0]->period;
     for(unsigned long i = 1; i < numTasks; i++){
