@@ -75,8 +75,8 @@ int main(void) {
     DDRB = 0x7F; PORTB = 0x80;
     DDRC = 0xF0; PORTC = 0x0F;
     /* Insert your solution below */
-    static task task1, task2;
-    task *tasks[] = {&task1, &task2};
+    static task task1, task2, task3;
+    task *tasks[] = {&task1, &task2, &task3};
     const unsigned short numTasks = sizeof(tasks)/sizeof(task*);
     const char start = -1;
 
