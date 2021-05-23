@@ -143,6 +143,7 @@ int display_lock(int state) {
     if(lock_signal == 0x00) {
         PORTB |= 0x01;
     } else PORTB &= 0xFE;
+    return state;
 }
 
 unsigned char bell_timer = 0x0C;
