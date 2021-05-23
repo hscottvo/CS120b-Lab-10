@@ -153,7 +153,7 @@ unsigned char bell_time = 0x0F;
 enum bell_states {bell_wait, bell_play};
 
 int doorbell_tick(int state) {
-    unsigned char input = (~PINB & 0x40);
+    unsigned char input = (~PINA & 0x80);
     switch(state) {
         case bell_wait: 
             if (input != 0x00) {
@@ -179,6 +179,7 @@ int doorbell_tick(int state) {
 
 int main(void) {
     /* Insert DDR and PORT initializations */
+    DDRA = 0x00; PORTA = 0xFF;
     DDRB = 0x7F; PORTB = 0x80;
     DDRC = 0xF0; PORTC = 0x0F;
     /* Insert your solution below */
