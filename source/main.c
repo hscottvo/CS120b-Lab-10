@@ -147,7 +147,7 @@ int display_lock(int state) {
 }
 
 unsigned char bell_timer = 0x0C;
-double song[10] = {440, 349.23, 392.00, 261.63, 261.63, 0, 261.63, 392, 440, 349.23};
+double song[11] = {440, 349.23, 392.00, 261.63, 261.63, 0, 261.63, 392, 440, 349.23, 349.23};
 unsigned char bell_index = 0x00;
 unsigned char bell_time = 0x0F;
 
@@ -165,7 +165,7 @@ int doorbell_tick(int state) {
             if (bell_time <= bell_timer) {
                 bell_time += 1;
                 state = bell_play;
-            } else if (bell_index <= 10) {
+            } else if (bell_index <= 11) {
                 bell_time = 0;
                 set_PWM(song[bell_index]);
                 bell_index += 1;
