@@ -51,6 +51,7 @@ enum pass_states {pass_wait};
 
 int check_pass(int state) {
     unsigned char input = (~PINB & 0x80);
+    state = pass_wait;
     switch(state) {
         case pass_wait:
             PORTB = 0x01 | (~PINB & 0xFE);
