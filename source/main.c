@@ -107,7 +107,11 @@ int main(void) {
     DDRB = 0x7F; PORTB = 0x80;
     DDRC = 0xF0; PORTC = 0x0F;
     while(1) {
-        PORTB = 0xFF;
+        if (PINB & 0x80) {
+            PORTB |= 0x01;
+        } else {
+            PORTB &= 0xFE;
+        }
     }
     return 0;
 }
