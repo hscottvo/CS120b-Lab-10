@@ -167,6 +167,7 @@ int doorbell_tick(int state) {
             } else if (bell_index <= 5) {
                 bell_time = 0;
                 set_PWM(song[bell_index]);
+                bell_index += 1;
                 state = bell_play;
             } else {
                 bell_time = 0;
