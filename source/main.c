@@ -22,7 +22,7 @@ unsigned char lock_state = 0x01;
 int keypad_tick(int state) {
     pad = GetKeypadKey();
     switch(pad) {
-        case '\0': break;
+        case '\0': PORTB = 0x00 | (~PORTB & 0x80); break;
         case '1': PORTB = 0x40 | (~PORTB & 0x80); break;
         case '2': PORTB = 0x40 | (~PORTB & 0x80); break;
         case '3': PORTB = 0x40 | (~PORTB & 0x80); break;
