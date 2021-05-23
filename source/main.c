@@ -33,7 +33,6 @@ int main(void) {
             case '7': PORTB = 0x07; break;
             case '8': PORTB = 0x08; break;
             case '9': PORTB = 0x09; break;
-            case '0': PORTB = 0x00; break;
             case 'A': PORTB = 0x0A; break;
             case 'B': PORTB = 0x0B; break;
             case 'C': PORTB = 0x0C; break;
