@@ -18,6 +18,7 @@
 
 unsigned char pad = 0x00;
 unsigned char lock_state = 0x01;
+unsigned char lock_signal = 0x00;
 
 int keypad_tick(int state) {
     pad = GetKeypadKey();
@@ -45,17 +46,22 @@ int keypad_tick(int state) {
 }
 
 unsigned char pass[5] = {'1', '2', '3', '4', '5'};
-unsigned char pass_index;
+unsigned char pass_index = 0x00;
 
 enum pass_states {pass_wait};
 
 int check_pass(int state) {
+    return state;
+}
+
+int check_lock(int state) {
     unsigned char input = (~PINB & 0x80);
     state = pass_wait;
     switch(state) {
         case pass_wait:
             if(input != 0x00){
-                PORTB |= (input >> 7);
+                lock_signal = 0x01;
+                state = pass_
             } else PORTB &= 0xFE;
     }
     switch(state) {
@@ -83,6 +89,11 @@ int main(void) {
     task2.period = 50;
     task2.elapsedTime = task2.period;
     task2.TickFct = &check_pass;
+
+    task3.state = start;
+    task3.period = 50;
+    task3.elapsedTime = task3.period;
+    task3.TickFct = &check_lock;
 
     unsigned long GCD = tasks[0]->period;
     for(unsigned long i = 1; i < numTasks; i++){
