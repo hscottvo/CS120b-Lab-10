@@ -54,7 +54,7 @@ int check_pass(int state) {
     state = pass_wait;
     switch(state) {
         case pass_wait:
-            PORTB = 0x01 | (~PINB & 0xFE);
+            PORTB = 0x01 | ~PINB;
     }
     switch(state) {
 
