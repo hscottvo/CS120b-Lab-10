@@ -76,23 +76,60 @@ int keypad_tick(int state) {
     return state;
 }
 
-unsigned char pass[5] = {'1', '2', '3', '4', '5'};
+unsigned char pass[5] = {'1', '2', '3', '4'};
 unsigned char pass_index = 0x00;
+unsigned char new_pass[4] = {'\0', '\0', '\0', '\0'};
+unsigned char new_index = 0x00;
 
-enum pass_states {pass_wait, pass_start, pass_input, pass_input_press, pass_unlock};
+enum pass_states {pass_wait, pass_start, pass_input, pass_input_press, pass_unlock, pass_set, pass_set_wait};
 
 int check_pass(int state) {
+    unsigned char input = ~PINB & 0x80;
     switch(state) {
         case pass_wait:
             if(pad == '#') {
-                state = pass_start;
+                if (input != 0x00) {
+                    state = pass_set;
+                } else state = pass_start;
             } else state = pass_wait;
             pass_index = 0x00;
             break;
         case pass_start: 
-            if (pad == '#') state = pass_start;
+            if (pad == '#') {
+                if (input != 0x00) {
+                    state = pass_set;
+                } else state = pass_start;
+            }
             else if (pad == '\0') state = pass_input;
             else state = pass_wait;
+            break;
+        case pass_set:
+            if(input != 0x00 && new_index < 4){
+                new_index = 0x00;
+                for (unsigned char i = 0; i < 4; i++) {
+                    new_pass[i] = '\0';
+                }
+                state = pass_wait;
+            } else if (input != 0x00 && new_index >= 4) {
+                state = pass_check_                
+            } else {
+                if(pad == '#' || pad == '\0') state = pass_wait;
+                else {
+                    new_pass[i] = pad;
+                    new_index += 1;
+                    state = pass_set_wait;
+                }
+            }
+            break;
+        case pass_set_wait: 
+            if(input!= 0x00) {
+                new_index = 0x00;
+                for (unsigned char i = 0; i < 4; i++) {
+                    new_pass[i] = '\0';
+                }
+                state = pass_wait;
+            } else if (pad == '\0') state = pass_set;
+            else state = pass_set_wait;
             break;
         case pass_input: 
             if(pad == '\0') state = pass_input;
@@ -185,7 +222,7 @@ int doorbell_tick(int state) {
 int main(void) {
     /* Insert DDR and PORT initializations */
     DDRA = 0x00; PORTA = 0xFF;
-    DDRB = 0x7F; PORTB = 0x80;
+    DDRB = 0x5F; PORTB = 0xA0;
     DDRC = 0xF0; PORTC = 0x0F;
     /* Insert your solution below */
     static task task1, task2, task3, task4, task5;
